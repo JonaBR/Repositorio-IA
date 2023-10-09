@@ -1,0 +1,85 @@
+public void busquedaPorAnchura() {
+       Nodo nodoActual = raiz;
+       Collection<String> estadosVisitados = new ArrayList<String>();
+       Queue<Nodo> estadosPorVisitar = new LinkedList<Nodo>();
+       while (!nodoActual.getEstado().equals(objetivo)) {
+           estadosVisitados.add(nodoActual.getEstado());
+           // Generar a los Nodos Hijos
+           Collection<String> hijos = nodoActual.generaHijos(); 
+           for (String hijo : hijos) {
+               if (!estadosVisitados.contains(hijo)) {
+                   // System.out.println("---Metiendo nuevo Nodo");
+                   // Crear nuevo Nodo.
+                   Nodo nHijo = new Nodo(hijo);
+                   nHijo.prof = nodoActual.prof + 1;
+                   nHijo.setPadre(nodoActual);
+                   estadosPorVisitar.add(nHijo);
+               }
+           }
+           nodoActual = estadosPorVisitar.poll();
+       }
+       System.out.println("YA SE ENCONTRO EL NODO OBJETIVO");
+       System.out.println(nodoActual.getEstado() + "\n");
+       System.out.println(nodoActual.prof + "\n");
+       System.out.println("Se imprimiran los pasos para conseguir el estado final");
+       camino(nodoActual, new String());
+    }
+public void busquedaPorProfundidad() {
+       Nodo nodoActual = raiz;
+       Collection<String> estadosVisitados = new ArrayList<String>();
+       Stack<Nodo> estadosPorVisitar = new Stack<Nodo>();
+       while (!nodoActual.getEstado().equals(objetivo)) {
+           estadosVisitados.add(nodoActual.getEstado());
+           // Generar a los Nodos Hijos
+           Collection<String> hijos = nodoActual.generaHijos(); 
+           for (String hijo : hijos) {
+               if (!estadosVisitados.contains(hijo)) {
+                   // System.out.println("---Metiendo nuevo Nodo");
+                   // Crear nuevo Nodo.
+                   Nodo nHijo = new Nodo(hijo);
+                   nHijo.prof = nodoActual.prof + 1;
+                   nHijo.setPadre(nodoActual);
+                   estadosPorVisitar.add(nHijo);
+               }
+           }
+           nodoActual = estadosPorVisitar.pop();
+       }
+       System.out.println("YA SE ENCONTRO EL NODO OBJETIVO");
+       System.out.println(nodoActual.getEstado());
+       System.out.println(nodoActual.prof+ "\n");
+       System.out.println("Se imprimiran los pasos para conseguir el estado final");
+       camino(nodoActual, new String());
+        
+   }
+public void busquedaPorCostoUniforme() {
+       Nodo nodoActual = raiz;
+       Collection<String> estadosVisitados = new ArrayList<String>();
+       PriorityQueue<Nodo> estadosPorVisitar = new PriorityQueue<Nodo>(new Comparator<Nodo>() {
+           @Override
+           public int compare(Nodo n1, Nodo n2) {
+               return Integer.compare(n1.getCosto(), n2.getCosto());
+           }
+       });
+
+       while (!nodoActual.getEstado().equals(objetivo)) {
+           estadosVisitados.add(nodoActual.getEstado());
+
+           Collection<String> hijos = nodoActual.generaHijos();
+           for (String hijo : hijos) {
+               if (!estadosVisitados.contains(hijo)) {
+                   Nodo nHijo = new Nodo(hijo);
+                   nHijo.prof = nodoActual.prof + 1;
+                   nHijo.setPadre(nodoActual);
+                   nHijo.setCosto(nodoActual.getCosto() + 1); // Actualizar el costo
+                   estadosPorVisitar.add(nHijo);
+              }
+           }
+           nodoActual = estadosPorVisitar.poll();
+       }
+
+       System.out.println("YA SE ENCONTRÓ EL NODO OBJETIVO");
+       System.out.println(nodoActual.getEstado());
+       System.out.println(nodoActual.prof + "\n");
+       System.out.println("Se imprimirán los pasos para conseguir el estado final");
+       camino(nodoActual, new String());
+   }
