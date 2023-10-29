@@ -1,0 +1,134 @@
+import math
+
+def ImprimirTablero(tablero):
+    for row in tablero:
+        print(" | ".join(row))
+        print("-" * (len(row) * 4 - 1))
+
+def evaluar(tablero):
+    for row in tablero:
+        if len(set(row)) == 1 and row[0] != ' ':
+            return row[0]
+
+    for col in range(len(tablero)):
+        if tablero[0][col] == tablero[1][col] == tablero[2][col] != ' ':
+            return tablero[0][col]
+
+    if tablero[0][0] == tablero[1][1] == tablero[2][2] != ' ':
+        return tablero[0][0]
+
+    if tablero[0][2] == tablero[1][1] == tablero[2][0] != ' ':
+        return tablero[0][2]
+
+    return None
+
+def tableroLleno(tablero):
+    return all(tablero[i][j] != ' ' for i in range(3) for j in range(3))
+
+def minimax(tablero, profundidad, maximizar, alpha, beta):
+    resultado = evaluar(tablero)
+
+    if resultado:
+        if resultado == 'X':
+            return -10 + profundidad, None
+        elif resultado == 'O':
+            return 10 - profundidad, None
+        else:
+            return 0, None
+
+    if tableroLleno(tablero):
+        return 0, None
+
+    if maximizar:
+        valorOptimo = -math.inf
+        movimientoOptimo = None
+
+        for i in range(3):
+            for j in range(3):
+                if tablero[i][j] == ' ':
+                    tablero[i][j] = 'O'
+                    val, _ = minimax(tablero, profundidad + 1, False, alpha, beta)
+                    tablero[i][j] = ' '
+
+                    if val > valorOptimo:
+                        valorOptimo = val
+                        movimientoOptimo = (i, j)
+
+                    alpha = max(alpha, valorOptimo)
+                    if beta <= alpha:
+                        break
+
+        return valorOptimo, movimientoOptimo
+    else:
+        valorOptimo = math.inf
+        movimientoOptimo = None
+
+        for i in range(3):
+            for j in range(3):
+                if tablero[i][j] == ' ':
+                    tablero[i][j] = 'X'
+                    val, _ = minimax(tablero, profundidad + 1, True, alpha, beta)
+                    tablero[i][j] = ' '
+
+                    if val < valorOptimo:
+                        valorOptimo = val
+                        movimientoOptimo = (i, j)
+
+                    beta = min(beta, valorOptimo)
+                    if beta <= alpha:
+                        break
+
+        return valorOptimo, movimientoOptimo
+
+def iniciar():
+    tablero = [[' ' for _ in range(3)] for _ in range(3)]
+    print("Bienvenido!")
+    ImprimirTablero(tablero)
+
+    Jugador = input("Quién comienza? (X 'Jugador', O para la 'IA'): ")
+
+    if Jugador == 'X':
+        maximizar = False
+    else:
+        maximizar = True
+
+    while True:
+        if maximizar:
+            _, move = minimax(tablero, 0, True, -math.inf, math.inf)
+            tablero[move[0]][move[1]] = 'O'
+            ImprimirTablero(tablero)
+            resultado = evaluar(tablero)
+
+            if resultado:
+                if resultado == 'O':
+                    print("La IA gana!")
+                else:
+                    print("Es un Empate!")
+                break
+            elif tableroLleno(tablero):
+                print("Es un Empate!")
+                break
+            else:
+                maximizar = False
+        else:
+            row, col = map(int, input("Elije tu movimiento (elige un espacio, ejem., 1 2): ").split())
+            if tablero[row - 1][col - 1] == ' ':
+                tablero[row - 1][col - 1] = 'X'
+                ImprimirTablero(tablero)
+                resultado = evaluar(tablero)
+
+                if resultado:
+                    if resultado == 'X':
+                        print("Ganaste!")
+                    else:
+                        print("Es un Empate!")
+                    break
+                elif tableroLleno(tablero):
+                    print("Es un Empate!")
+                    break
+                else:
+                    maximizar = True
+            else:
+                print("Movimiento invalido, intenta denuevo.")
+
+iniciar()
